@@ -4,6 +4,7 @@ require('dotenv').config();
 const cors = require('cors');
 const port = process.env.PORT || 3000;
 const { MongoClient, ServerApiVersion } = require('mongodb');
+const bcrypt = require('bcrypt');
 
 app.use(cors());
 app.use(express.json())
@@ -25,7 +26,32 @@ async function run() {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
 
-        // const userCollection  = 
+        const userCollection = client.db('fashionEra').collection('users');
+
+        // save register user informations
+        app.post('/sign-up-user-info', async (req, res) => {
+            const { name, email, image, password } = req.body;
+            try {
+                if (!name || !email || !image || !password) {
+                    return res.status(400).send({ message: "All fields are required" });
+                };
+                const hashPassword = await bcrypt.hash(password, 14);
+                const formattedDate = new Date().toLocaleString("en-US", {
+                    timeZone: "Asia/Dhaka"
+                });
+                const userInfo = {
+                    name,
+                    email,
+                    image,
+                    password: hashPassword,
+                    createdAt: formattedDate,
+                }
+                const result = await userCollection.insertOne(userInfo)
+                res.status(201).send({ message: "User registered successfully", data: result });
+            } catch (error) {
+                res.status(500).send({ message: "Internal server error" });
+            }
+        })
 
 
 

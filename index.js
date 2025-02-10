@@ -1,12 +1,18 @@
 const express = require('express');
 const app = express();
 require('dotenv').config();
+const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const port = process.env.PORT || 3000;
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const bcrypt = require('bcrypt');
 
-app.use(cors());
+app.use(cors({
+    origin: [
+        'http://localhost:5173'
+    ],
+    credentials: true
+}));
 app.use(express.json())
 
 
@@ -28,6 +34,24 @@ async function run() {
 
         const userCollection = client.db('fashionEra').collection('users');
 
+
+
+        // token generator api 
+        app.post('/jwt', (req, res) => {
+            const data = req?.body;
+            console.log(data);
+            // const token = jwt.sign({
+            //     data
+            // }, process.env.SECRET, { expiresIn: '1h' });
+            // res
+            // .cookie('token', {
+            //     httpt
+            // })
+            res.send({message: 'Hello, i am ok'})
+        })
+
+
+
         // save register user informations
         app.post('/sign-up-user-info', async (req, res) => {
             const { name, email, image, password } = req.body;
@@ -47,7 +71,7 @@ async function run() {
                     createdAt: formattedDate,
                 }
                 const result = await userCollection.insertOne(userInfo)
-                res.status(201).send({ message: "User registered successfully", data: result });
+                res.status(200).send({ message: "User registered successfully", data: result });
             } catch (error) {
                 res.status(500).send({ message: "Internal server error" });
             }
@@ -70,7 +94,7 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-    res.send({ message: 'Welcome to FashionEra API', status: 'success' })
+    res.send({ message: 'Welcome to FashionEra API', status: 200 })
 })
 
 app.listen(port, () => {

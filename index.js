@@ -6,14 +6,34 @@ const cors = require('cors');
 const port = process.env.PORT || 3000;
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const bcrypt = require('bcrypt');
+const cookieParser = require('cookie-parser')
 
+
+//middleware
 app.use(cors({
     origin: [
         'http://localhost:5173'
     ],
     credentials: true
 }));
-app.use(express.json())
+app.use(express.json());
+app.use(cookieParser())
+
+
+//custom milldewares
+const verifyToken = (req, res, next) => {
+    const token = req?.cookies?.token;
+    if (!token) {
+        return res.status(401).send({ message: 'unauthorized access' });
+    }
+    jwt.verify(token, process.env.SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(401).send({ message: 'unauthorized access' });
+        }
+        req.user = decoded;
+        next();
+    });
+};
 
 
 const uri = `mongodb+srv://${process.env.MONGODB_USER_KEY}:${process.env.MONGODB_PASS_KEY}@cluster0.gphdl2n.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
@@ -40,11 +60,10 @@ async function run() {
         app.get('/jwt', async (req, res) => {
             try {
                 const data = req?.query?.email;
-                console.log(data);
                 if (!data) {
                     return res.status(400).json({ message: 'Invalid request data' });
                 }
-                const token = jwt.sign({email: data}, process.env.SECRET, { expiresIn: '1h' });
+                const token = jwt.sign({ email: data }, process.env.SECRET, { expiresIn: '1h' });
                 res
                     .cookie('token', token, {
                         httpOnly: true,
@@ -58,12 +77,38 @@ async function run() {
         })
 
         // remove token form cookie
-        app.get('/remove-token', (req, res) => {
+        app.get('/token-remove', (req, res) => {
             res
-            .clearCookie('token', {
-                maxAge: 0
-            })
-            .send({message: 'Cookie Remove Successfully.', status: 200})
+                .clearCookie('token', {
+                    maxAge: 0
+                })
+                .send({ message: 'Cookie Remove Successfully.', status: 200 })
+        })
+
+
+
+        //Profile releted api
+        app.get(`/user-info`, verifyToken, async (req, res) => {
+            try {
+                // if (req?.query?.email !== req?.user?.email) {
+                //     return res.send({
+                //         message: "Unauthorized access",
+                //         status: 401
+                //     })
+                // }
+                const result = await userCollection.findOne({ email: req?.query?.email });
+                res.send({ message: "User info get successfully.", status: 200, data: result })
+            } catch (error) {
+                return res.send({
+                    message: "Internal server error",
+                    status: 500
+                })
+            }
+        })
+
+        app.get('/get-all', verifyToken, async (req, res) => {
+            const result = await userCollection.find().toArray()
+            res.send({data: result})
         })
 
 

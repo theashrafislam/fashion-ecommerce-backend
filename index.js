@@ -37,17 +37,33 @@ async function run() {
 
 
         // token generator api 
-        app.post('/jwt', (req, res) => {
-            const data = req?.body;
-            console.log(data);
-            // const token = jwt.sign({
-            //     data
-            // }, process.env.SECRET, { expiresIn: '1h' });
-            // res
-            // .cookie('token', {
-            //     httpt
-            // })
-            res.send({message: 'Hello, i am ok'})
+        app.get('/jwt', async (req, res) => {
+            try {
+                const data = req?.query?.email;
+                console.log(data);
+                if (!data) {
+                    return res.status(400).json({ message: 'Invalid request data' });
+                }
+                const token = jwt.sign({email: data}, process.env.SECRET, { expiresIn: '1h' });
+                res
+                    .cookie('token', token, {
+                        httpOnly: true,
+                        secure: true,
+                        sameSite: 'none'
+                    })
+                    .send({ message: 'Get JWT Token', status: 200 });
+            } catch (error) {
+                res.status(500).json({ message: 'Internal Server Error' });
+            }
+        })
+
+        // remove token form cookie
+        app.get('/remove-token', (req, res) => {
+            res
+            .clearCookie('token', {
+                maxAge: 0
+            })
+            .send({message: 'Cookie Remove Successfully.', status: 200})
         })
 
 

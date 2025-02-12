@@ -139,10 +139,16 @@ async function run() {
                 const userId = req?.query?.id;
                 const { name, password } = req.body;
                 const query = { _id: new ObjectId(userId) };
-                const updateDoc = {
-                    $set: { name, password }
+                const updateDoc = {};
+                if(name) updateDoc.name = name;
+                if(password) updateDoc.password = password;
+                if(Object.keys(updateDoc).length === 0){
+                    return res.status(400).send({ message: "No fields to update!" });
+                }
+                const updateData = {
+                    $set: updateDoc
                 };
-                const result = await userCollection.updateOne(query, updateDoc)
+                const result = await userCollection.updateOne(query, updateData)
                 if (result?.modifiedCount > 0) {
                     return res.status(200).send({ message: "Update Successfully." })
                 }

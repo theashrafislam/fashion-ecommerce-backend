@@ -4,7 +4,7 @@ require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const port = process.env.PORT || 3000;
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser')
 
@@ -86,33 +86,6 @@ async function run() {
         })
 
 
-
-        //Profile releted api
-        app.get(`/user-info`, verifyToken, async (req, res) => {
-            try {
-                // if (req?.query?.email !== req?.user?.email) {
-                //     return res.send({
-                //         message: "Unauthorized access",
-                //         status: 401
-                //     })
-                // }
-                const result = await userCollection.findOne({ email: req?.query?.email });
-                res.send({ message: "User info get successfully.", status: 200, data: result })
-            } catch (error) {
-                return res.send({
-                    message: "Internal server error",
-                    status: 500
-                })
-            }
-        })
-
-        app.get('/get-all', verifyToken, async (req, res) => {
-            const result = await userCollection.find().toArray()
-            res.send({data: result})
-        })
-
-
-
         // save register user informations
         app.post('/sign-up-user-info', async (req, res) => {
             const { name, email, image, password } = req.body;
@@ -137,6 +110,54 @@ async function run() {
                 res.status(500).send({ message: "Internal server error" });
             }
         })
+
+
+        //Profile releted api
+        app.get(`/user-info`, verifyToken, async (req, res) => {
+            try {
+                if (req?.query?.email !== req?.user?.email) {
+                    return res
+                        .status(401)
+                        .send({
+                            message: "Unauthorized access"
+                        })
+                }
+                const result = await userCollection.findOne({ email: req?.query?.email });
+                res.send({ message: "User info get successfully.", status: 200, data: result })
+            } catch (error) {
+                return res
+                    .status(500)
+                    .send({
+                        message: "Internal server error"
+                    })
+            }
+        })
+
+        //profile data update api
+        app.patch('/update-user-info', async (req, res) => {
+            try {
+                const userId = req?.query?.id;
+                const { name, password } = req.body;
+                const query = { _id: new ObjectId(userId) };
+                const updateDoc = {
+                    $set: { name, password }
+                };
+                const result = await userCollection.updateOne(query, updateDoc)
+                if (result?.modifiedCount > 0) {
+                    return res.status(200).send({ message: "Update Successfully." })
+                }
+            } catch (error) {
+                return res
+                .status(500)
+                .send({
+                    message: "Internal server error"
+                })
+            }
+        })
+
+
+
+
 
 
 

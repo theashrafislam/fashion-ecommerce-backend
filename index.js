@@ -140,24 +140,26 @@ async function run() {
                 const { name, password } = req.body;
                 const query = { _id: new ObjectId(userId) };
                 const updateDoc = {};
-                if(name) updateDoc.name = name;
-                if(password) updateDoc.password = password;
-                if(Object.keys(updateDoc).length === 0){
+                if (name) updateDoc.name = name;
+                if (password) {
+                    const hashPassword = await bcrypt.hash(password, 14);
+                    updateDoc.password = hashPassword;
+                }
+                if (Object.keys(updateDoc).length === 0) {
                     return res.status(400).send({ message: "No fields to update!" });
                 }
                 const updateData = {
                     $set: updateDoc
                 };
+                console.log(updateDoc);
                 const result = await userCollection.updateOne(query, updateData)
-                if (result?.modifiedCount > 0) {
-                    return res.status(200).send({ message: "Update Successfully." })
-                }
+                res.status(200).send({message: "Update Done"})
             } catch (error) {
                 return res
-                .status(500)
-                .send({
-                    message: "Internal server error"
-                })
+                    .status(500)
+                    .send({
+                        message: "Internal server error"
+                    })
             }
         })
 

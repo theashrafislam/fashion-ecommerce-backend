@@ -91,7 +91,6 @@ async function run() {
         app.post('/sign-up-user-info', async (req, res) => {
             const { name, email, image, password } = req.body;
             console.log(req?.body);
-            console.log(name);
             try {
                 if (!name || !email || !image || !password) {
                     return res.status(400).send({ message: "All fields are required" });
@@ -156,7 +155,7 @@ async function run() {
                 };
                 console.log(updateDoc);
                 const result = await userCollection.updateOne(query, updateData)
-                res.status(200).send({message: "Update Done"})
+                res.status(200).send({ message: "Update Done" })
             } catch (error) {
                 return res
                     .status(500)
@@ -187,8 +186,16 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-    res.send({ message: 'Welcome to FashionEra API', status: 'ok' })
-})
+    const now = new Date();
+    const bdTime = now.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' });
+
+    res.send({
+        message: 'Welcome to FashionEra API',
+        status: 200,
+        server_time: now.toISOString(),
+        bd_time: bdTime
+    });
+});
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)

@@ -63,6 +63,7 @@ async function run() {
                 if (!data) {
                     return res.status(400).json({ message: 'Invalid request data' });
                 }
+                console.log('hello iam here');
                 const token = jwt.sign({ email: data }, process.env.SECRET, { expiresIn: '1h' });
                 res
                     .cookie('token', token, {
@@ -70,7 +71,7 @@ async function run() {
                         secure: true,
                         sameSite: 'none'
                     })
-                    .send({ message: 'Get JWT Token', status: 200 });
+                    .send({ message: 'Get And Set JWT Token', status: 200 });
             } catch (error) {
                 res.status(500).json({ message: 'Internal Server Error' });
             }
@@ -89,6 +90,8 @@ async function run() {
         // save register user informations
         app.post('/sign-up-user-info', async (req, res) => {
             const { name, email, image, password } = req.body;
+            console.log(req?.body);
+            console.log(name);
             try {
                 if (!name || !email || !image || !password) {
                     return res.status(400).send({ message: "All fields are required" });
@@ -184,7 +187,7 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-    res.send({ message: 'Welcome to FashionEra API', status: 200 })
+    res.send({ message: 'Welcome to FashionEra API', status: 'ok' })
 })
 
 app.listen(port, () => {

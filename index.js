@@ -192,8 +192,8 @@ app.get('/', (req, res) => {
     res.send({
         message: 'Welcome to FashionEra API',
         status: 200,
-        // server_time: now.toISOString(),
-        // bd_time: bdTime
+        server_time: now.toISOString(),
+        bd_time: bdTime
     });
 });
 

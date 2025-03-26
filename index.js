@@ -90,7 +90,6 @@ async function run() {
         // save register user informations
         app.post('/sign-up-user-info', async (req, res) => {
             const { name, email, image, password } = req.body;
-            console.log(req?.body);
             try {
                 if (!name || !email || !image || !password) {
                     return res.status(400).send({ message: "All fields are required" });
@@ -187,7 +186,6 @@ run().catch(console.dir);
 
 app.get('/', (req, res) => {
     const now = new Date();
-
     res.send({
         message: 'Welcome to FashionEra API',
         status: 200,

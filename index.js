@@ -188,33 +188,10 @@ run().catch(console.dir);
 app.get('/', (req, res) => {
     const now = new Date();
 
-    // Bangladesh Time
-    const bdTime = new Intl.DateTimeFormat('en-US', {
-        timeZone: 'Asia/Dhaka',
-        dateStyle: 'full',
-        timeStyle: 'long'
-    }).format(now);
-
-    // Philippines Time
-    const phTime = new Intl.DateTimeFormat('en-US', {
-        timeZone: 'Asia/Manila',
-        dateStyle: 'full',
-        timeStyle: 'long'
-    }).format(now);
-
-    const deTime = new Intl.DateTimeFormat('en-US', { 
-        timeZone: 'Europe/Berlin', 
-        dateStyle: 'full', 
-        timeStyle: 'long' 
-    }).format(now);
-
     res.send({
         message: 'Welcome to FashionEra API',
         status: 200,
         server_time: now.toISOString(),
-        bd_time: bdTime,
-        ph_time: phTime,
-        de_time: deTime
     });
 });
 

@@ -4,9 +4,10 @@ require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const port = process.env.PORT || 3000;
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const { ObjectId } = require('mongodb');
 const bcrypt = require('bcrypt');
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
+const { connectDB, db } = require('./config/database');
 
 
 //middleware
@@ -36,23 +37,25 @@ const verifyToken = (req, res, next) => {
 };
 
 
-const uri = `mongodb+srv://${process.env.MONGODB_USER_KEY}:${process.env.MONGODB_PASS_KEY}@cluster0.gphdl2n.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+// const uri = `mongodb+srv://${process.env.MONGODB_USER_KEY}:${process.env.MONGODB_PASS_KEY}@cluster0.gphdl2n.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
-    serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-    }
-});
+// // Create a MongoClient with a MongoClientOptions object to set the Stable API version
+// const client = new MongoClient(uri, {
+//     serverApi: {
+//         version: ServerApiVersion.v1,
+//         strict: true,
+//         deprecationErrors: true,
+//     }
+// });
 
 async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
+        // await client.connect();
+        await connectDB()
+        const userCollection = db.collection('users')
 
-        const userCollection = client.db('fashionEra').collection('users');
+        // const userCollection = client.db('fashionEra').collection('users');
 
 
 
@@ -173,7 +176,7 @@ async function run() {
 
 
         // Send a ping to confirm a successful connection
-        await client.db("admin").command({ ping: 1 });
+        // await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
         // Ensures that the client will close when you finish/error

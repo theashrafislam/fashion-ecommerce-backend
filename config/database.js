@@ -22,6 +22,6 @@ async function connectDB() {
     }
 };
 
-const db = client.db('fashionEr');
+const db = client.db('fashionEra');
 
 module.exports = { connectDB, db }

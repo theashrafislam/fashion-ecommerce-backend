@@ -186,10 +186,12 @@ run().catch(console.dir);
 
 app.get('/', (req, res) => {
     const now = new Date();
+    const bdTime = now.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' });
     res.send({
         message: 'Welcome to FashionEra API',
         status: 200,
         server_time: now.toISOString(),
+        bangladeshi_time: bdTime
     });
 });
 

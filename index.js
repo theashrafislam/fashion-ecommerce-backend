@@ -97,6 +97,10 @@ async function run() {
                 if (!name || !email || !image || !password) {
                     return res.status(400).send({ message: "All fields are required" });
                 };
+                const existingUser = await User.findOne({ email });
+                if(existingUser){
+                    
+                };
                 const hashPassword = await bcrypt.hash(password, 14);
                 const formattedDate = new Date().toLocaleString("en-US", {
                     timeZone: "Asia/Dhaka"
@@ -107,8 +111,8 @@ async function run() {
                     image,
                     password: hashPassword,
                     createdAt: formattedDate,
-                }
-                const result = await userCollection.insertOne(userInfo)
+                };
+                const result = await userCollection.insertOne(userInfo);
                 res.status(200).send({ message: "User registered successfully", data: result });
             } catch (error) {
                 res.status(500).send({ message: "Internal server error" });

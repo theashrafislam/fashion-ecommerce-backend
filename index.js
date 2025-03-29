@@ -97,11 +97,11 @@ async function run() {
                 if (!name || !email || !image || !password) {
                     return res.status(400).send({ message: "All fields are required" });
                 };
-                const existingUser = await userCollection.findOne({ email }, { unique: true });
+                const existingUser = await userCollection.findOne({ email });
                 if (existingUser) {
                     return res.status(400).send({ message: "Email already exists" })
                 };
-                const hashPassword = await bcrypt.hash(password, 14);
+                const hashPassword = await bcrypt.hash(password, 10);
                 const formattedDate = new Date().toLocaleString("en-US", {
                     timeZone: "Asia/Dhaka"
                 });

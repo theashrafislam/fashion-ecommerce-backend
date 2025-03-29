@@ -97,9 +97,9 @@ async function run() {
                 if (!name || !email || !image || !password) {
                     return res.status(400).send({ message: "All fields are required" });
                 };
-                const existingUser = await User.findOne({ email });
-                if(existingUser){
-                    
+                const existingUser = await userCollection.findOne({ email }, { unique: true });
+                if (existingUser) {
+                    return res.status(400).send({ message: "Email already exists" })
                 };
                 const hashPassword = await bcrypt.hash(password, 14);
                 const formattedDate = new Date().toLocaleString("en-US", {
@@ -117,7 +117,7 @@ async function run() {
             } catch (error) {
                 res.status(500).send({ message: "Internal server error" });
             }
-        })
+        });
 
 
         //Profile releted api

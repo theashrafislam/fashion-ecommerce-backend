@@ -101,6 +101,7 @@ async function run() {
                 };
                 const existingUser = await userCollection.findOne({ email });
                 if (existingUser) {
+                    console.log('hello i am already');
                     return res.status(400).send({ message: "Email already exists" })
                 };
                 const hashPassword = await bcrypt.hash(password, 10);
@@ -120,6 +121,11 @@ async function run() {
                 res.status(500).send({ message: "Internal server error" });
             }
         });
+
+        app.post('/login', (req, res) => {
+            const {email, password} = req.body;
+            console.log(req.body);
+        })
 
 
         //Profile releted api

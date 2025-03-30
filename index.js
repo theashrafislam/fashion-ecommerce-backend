@@ -122,9 +122,31 @@ async function run() {
             }
         });
 
-        app.post('/login', (req, res) => {
-            const {email, password} = req.body;
+        app.post('/login', async (req, res) => {
+            const { email, password } = req.body;
             console.log(req.body);
+            try {
+                if (!email || !password) {
+                    return res.status(400).send({ message: "All fields are required" });
+                };
+                const existingUser = await userCollection.findOne({ email });
+                if (!existingUser) {
+                    console.log('hello');
+                    return res.status(404).json({ message: "User not found. Please sign up." });
+                };
+                const isPasswordMatch =  await bcrypt.compare(password, existingUser?.password);
+                if(!isPasswordMatch){
+                    return res.status(401).json({ message: "Incorrect password" });
+                }
+                console.log('you ready');
+            } catch (error) {
+                return res
+                    .status(500)
+                    .send({
+                        message: "Internal server error"
+                    })
+            }
+
         })
 
 

@@ -134,11 +134,20 @@ async function run() {
                     console.log('hello');
                     return res.status(404).json({ message: "User not found. Please sign up." });
                 };
-                const isPasswordMatch =  await bcrypt.compare(password, existingUser?.password);
-                if(!isPasswordMatch){
+                const isPasswordMatch = await bcrypt.compare(password, existingUser?.password);
+                if (!isPasswordMatch) {
                     return res.status(401).json({ message: "Incorrect password" });
                 }
                 console.log('you ready');
+                const token = jwt.sign({ userId: existingUser?._id, email: email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+                console.log('Hello Token: ', token);
+                return res
+                    .cookie('token', token, {
+                        httpOnly: true,
+                        secure: process.env.NODE_ENV === "production",
+                        sameSite: 'strict'
+                    })
+                    .status(200).send({ message: "Login successful" });
             } catch (error) {
                 return res
                     .status(500)

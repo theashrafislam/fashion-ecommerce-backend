@@ -122,7 +122,7 @@ async function run() {
             }
         });
 
-        app.post('/login', async (req, res) => {
+        app.post('/api/login', async (req, res) => {
             const { email, password } = req.body;
             console.log(req.body);
             try {
@@ -138,9 +138,7 @@ async function run() {
                 if (!isPasswordMatch) {
                     return res.status(401).json({ message: "Incorrect password" });
                 }
-                console.log('you ready');
                 const token = jwt.sign({ userId: existingUser?._id, email: email }, process.env.JWT_SECRET, { expiresIn: '1h' });
-                console.log('Hello Token: ', token);
                 return res
                     .cookie('token', token, {
                         httpOnly: true,

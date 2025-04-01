@@ -123,6 +123,7 @@ async function run() {
         });
 
         // today is eid day 
+        // today is rest day okay
 
         app.post('/api/login', async (req, res) => {
             const { email, password } = req.body;

@@ -22,19 +22,19 @@ app.use(cookieParser())
 
 
 //custom milldewares
-const verifyToken = (req, res, next) => {
-    const token = req?.cookies?.token;
-    if (!token) {
-        return res.status(401).send({ message: 'unauthorized access' });
-    }
-    jwt.verify(token, process.env.SECRET, (err, decoded) => {
-        if (err) {
-            return res.status(401).send({ message: 'unauthorized access' });
-        }
-        req.user = decoded;
-        next();
-    });
-};
+// const verifyToken = (req, res, next) => {
+//     const token = req?.cookies?.token;
+//     if (!token) {
+//         return res.status(401).send({ message: 'unauthorized access' });
+//     }
+//     jwt.verify(token, process.env.SECRET, (err, decoded) => {
+//         if (err) {
+//             return res.status(401).send({ message: 'unauthorized access' });
+//         }
+//         req.user = decoded;
+//         next();
+//     });
+// };
 
 
 // const uri = `mongodb+srv://${process.env.MONGODB_USER_KEY}:${process.env.MONGODB_PASS_KEY}@cluster0.gphdl2n.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
@@ -62,12 +62,22 @@ async function run() {
         const verifyToken = (req, res, next) => {
             // console.log(req);
             const token = req?.cookies?.token;
-            if(!token) return res.status(401).send({ message: "Unauthorized" });
+            console.log(token);
+            if (!token) return res.status(401).send({ message: "Unauthorized" });
+            jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+                if (err) {
+                    return res.status(403).send({ message: 'Forbiden access' });
+                }
+                console.log(req?.user);
+                req.user = decoded;
+                next();
+            });
         }
 
 
         app.get('/api/current-user', verifyToken, async (req, res) => {
-            console.log( 'hello i am here',req);
+            console.log('hello i am here', req.user);
+
         })
 
 

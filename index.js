@@ -68,7 +68,6 @@ async function run() {
                 if (err) {
                     return res.status(403).send({ message: 'Forbiden access' });
                 }
-                console.log(req?.user);
                 req.user = decoded;
                 next();
             });
@@ -77,7 +76,13 @@ async function run() {
 
         app.get('/api/current-user', verifyToken, async (req, res) => {
             console.log('hello i am here', req.user);
-
+            const user = await userCollection.findOne({email: req?.user?.email});
+            if(!user){
+                return res.status(404).send({message: 'User not found'});
+            }
+            const {name, email, image, createdAt, _id} = user;
+            console.log(user);
+            res.send({name, email, image, createdAt})
         })
 
 

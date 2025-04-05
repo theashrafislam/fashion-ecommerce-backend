@@ -58,6 +58,19 @@ async function run() {
         // const userCollection = client.db('fashionEra').collection('users');
 
 
+        //middleware for token verify
+        const verifyToken = (req, res, next) => {
+            // console.log(req);
+            const token = req?.cookies?.token;
+            if(!token) return res.status(401).send({ message: "Unauthorized" });
+        }
+
+
+        app.get('/api/current-user', verifyToken, async (req, res) => {
+            console.log( 'hello i am here',req);
+        })
+
+
 
         // token generator api 
         app.get('/jwt', async (req, res) => {
@@ -101,7 +114,6 @@ async function run() {
                 };
                 const existingUser = await userCollection.findOne({ email });
                 if (existingUser) {
-                    console.log('hello i am already');
                     return res.status(400).send({ message: "Email already exists" })
                 };
                 const hashPassword = await bcrypt.hash(password, 10);
